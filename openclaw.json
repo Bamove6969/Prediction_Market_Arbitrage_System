@@ -61,7 +61,10 @@
     "tailscale": {
       "mode": "off",
       "resetOnExit": false
-    }
+    },
+    "trustedProxies": [
+      "127.0.0.1"
+    ]
   },
   "skills": {
     "install": {
