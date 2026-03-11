@@ -14,16 +14,20 @@
       "google:default": {
         "provider": "google",
         "mode": "api_key"
+      },
+      "vercel-ai-gateway:default": {
+        "provider": "vercel-ai-gateway",
+        "mode": "api_key"
       }
     }
   },
   "agents": {
     "defaults": {
       "model": {
-        "primary": "google/gemini-3.1-pro-preview"
+        "primary": "vercel-ai-gateway/alibaba/qwen3.5-plus"
       },
       "models": {
-        "google/gemini-3.1-pro-preview": {}
+        "vercel-ai-gateway/alibaba/qwen3.5-plus": {}
       },
       "workspace": "/data/.openclaw/workspace",
       "compaction": {
