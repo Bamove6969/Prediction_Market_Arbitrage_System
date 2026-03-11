@@ -2,7 +2,12 @@
   "groups": {
     "-1003474396718": {
       "name": "My Workspace",
-      "topics": {}
+      "topics": {
+        "6": {
+          "name": "Lets do this",
+          "iconColor": 7322096
+        }
+      }
     }
   }
 }

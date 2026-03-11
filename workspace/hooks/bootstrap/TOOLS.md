@@ -54,6 +54,7 @@ When sending messages to group topics, use these thread IDs:
 
 | Group | Topic | Thread ID |
 | ----- | ----- | --------- |
+| My Workspace (-1003474396718) | Lets do this | 6 |
 
 ### Sync Rules
 
