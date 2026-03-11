@@ -5,7 +5,7 @@ description: Know when and how to direct the user to the AlphaClaw UI for config
 
 # AlphaClaw UI
 
-There is a web-based Setup UI at `http://127.0.0.1:3000`. The **user** manages runtime configuration through it. You should NOT call these API endpoints yourself or write config files directly — instead, tell the user what they need to do and where to do it.
+There is a web-based Setup UI at `http://localhost:3000`. The **user** manages runtime configuration through it. You should NOT call these API endpoints yourself or write config files directly — instead, tell the user what they need to do and where to do it.
 
 ## When to direct the user to the UI
 
@@ -13,25 +13,25 @@ There is a web-based Setup UI at `http://127.0.0.1:3000`. The **user** manages r
 
 When the user needs to add a new API key, token, or any env var:
 
-> You can add that in your Setup UI → **Envars** tab: http://127.0.0.1:3000#envars
+> You can add that in your Setup UI → **Envars** tab: http://localhost:3000#envars
 
 ### Connecting a new channel (Telegram, Discord)
 
-> Add your bot token in the Setup UI → **Envars** tab (http://127.0.0.1:3000#envars), then approve the pairing request in the **General** tab (http://127.0.0.1:3000#general).
+> Add your bot token in the Setup UI → **Envars** tab (http://localhost:3000#envars), then approve the pairing request in the **General** tab (http://localhost:3000#general).
 
 ### Approving or rejecting pairings
 
 When a user asks about pairing their Telegram or Discord account:
 
-> Open the Setup UI → **General** tab (http://127.0.0.1:3000#general). Pending pairing requests appear automatically — click **Approve** or **Reject**.
+> Open the Setup UI → **General** tab (http://localhost:3000#general). Pending pairing requests appear automatically — click **Approve** or **Reject**.
 
 ### Connecting OpenAI Codex OAuth
 
-> Connect or reconnect Codex OAuth from the Setup UI → **Providers** tab (http://127.0.0.1:3000#providers). Click **Connect Codex OAuth** and follow the popup flow.
+> Connect or reconnect Codex OAuth from the Setup UI → **Providers** tab (http://localhost:3000#providers). Click **Connect Codex OAuth** and follow the popup flow.
 
 ### Connecting Google Workspace
 
-> Set up Google Workspace from the Setup UI → **General** tab (http://127.0.0.1:3000#general, Google section). You'll need your OAuth client credentials from Google Cloud Console.
+> Set up Google Workspace from the Setup UI → **General** tab (http://localhost:3000#general, Google section). You'll need your OAuth client credentials from Google Cloud Console.
 
 Supported Google services (user selects which to enable during OAuth):
 
