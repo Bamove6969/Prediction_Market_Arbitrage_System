@@ -29,9 +29,9 @@
       "compaction": {
         "mode": "safeguard"
       },
-      "maxConcurrent": 4,
+      "maxConcurrent": 8,
       "subagents": {
-        "maxConcurrent": 8
+        "maxConcurrent": 6
       }
     }
   },
@@ -48,7 +48,13 @@
     "ownerDisplay": "raw"
   },
   "session": {
-    "dmScope": "per-channel-peer"
+    "dmScope": "per-channel-peer",
+    "resetByType": {
+      "thread": {
+        "mode": "idle",
+        "idleMinutes": 525600
+      }
+    }
   },
   "gateway": {
     "port": 18789,
@@ -76,7 +82,15 @@
       "enabled": true,
       "botToken": "${TELEGRAM_BOT_TOKEN}",
       "dmPolicy": "pairing",
-      "groupPolicy": "allowlist"
+      "groupPolicy": "allowlist",
+      "groups": {
+        "-1003474396718": {
+          "requireMention": false
+        }
+      },
+      "groupAllowFrom": [
+        "7679903354"
+      ]
     }
   },
   "plugins": {
