@@ -1,0 +1,91 @@
+services:
+  # IB Gateway
+  ibga:
+    image: heshiming/ibga
+    container_name: ibga-trading
+    restart: always
+    ipc: host
+    shm_size: 512mb
+    environment:
+      - TERM=xterm
+      - IB_USERNAME=fiend6969
+      - IB_PASSWORD=fj4T-U4FnouobkzN-UL7
+      - IB_REGION=America
+      - IB_TIMEZONE=America/Vancouver
+      - IB_LOGINTAB=IB API
+      - IB_LOGINTYPE=Live Trading
+      - IB_PREFER_IBKEY=true
+      - IBG_PORT_INTERNAL=4001
+    volumes:
+      - ./data:/home/ibg_settings
+    ports:
+      - "15800:5800"
+      - "40000:4000"
+      - "40010:4001"
+      - "40020:4002"
+
+    networks:
+      - arbitrage-net
+
+  # Arbitrage Backend with OpenRouter LLM
+  arbitrage-backend:
+    build: .
+    container_name: arbitrage-backend
+    restart: always
+    user: "1000:1000"
+    shm_size: 2gb
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    ports:
+      - "8001:8000"
+      - "5001:5000"
+    environment:
+      - PYTHONPATH=/app
+      - IB_GATEWAY_URL=http://ibga:4002
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - LLM_PROVIDER=openrouter
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    volumes:
+      - ./backend:/app/backend
+      - ./reports:/app/reports
+      - ./Cloud_GPU_Matcher_v3_Auto.ipynb:/app/Cloud_GPU_Matcher_v3_Auto.ipynb
+      - ./.git:/app/.git
+      - ~/.gitconfig:/root/.gitconfig:ro
+    depends_on:
+      - ibga
+    networks:
+      - arbitrage-net
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+
+  # Ngrok Tunnel for Colab Access
+  ngrok-tunnel:
+    image: ngrok/ngrok:latest
+    container_name: ngrok-tunnel
+    restart: always
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+      - NGROK_SERVER_REGION=us
+    command:
+      - "http"
+      - "arbitrage-backend:8000"
+      - "--domain=copyrightable-pseudocartilaginous-sade.ngrok-free.dev"
+      - "--log=stdout"
+      - "--log-level=debug"
+    ports:
+      - "4040:4040"
+    depends_on:
+      - arbitrage-backend
+    networks:
+      - arbitrage-net
+
+networks:
+  arbitrage-net:
+    driver: bridge
+
+volumes: {}

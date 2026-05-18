@@ -1,0 +1,69 @@
+# Universal Dockerfile - IBKR Gateway + Backend + Ngrok + Colab Executor
+# Base: heshiming/ibga (Debian 12, Python 3.11, Xvfb, VNC, noVNC already installed)
+FROM heshiming/ibga
+
+USER root
+WORKDIR /app
+
+# Install Python pip + extra system tools
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    curl \
+    wget \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for fast Python package management
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN uv pip install --system --break-system-packages -r requirements.txt
+
+# Install Colab integration packages
+RUN pip install --break-system-packages \
+    google-api-python-client \
+    google-auth-httplib2 \
+    google-auth-oauthlib \
+    websockets \
+    flask \
+    nest_asyncio
+
+# Install ngrok (arm64)
+RUN wget -q https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-arm64.tgz \
+    && tar -xzf ngrok-v3-stable-linux-arm64.tgz -C /usr/local/bin \
+    && rm ngrok-v3-stable-linux-arm64.tgz
+
+# Install Ollama (arm64)
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
+# Copy application
+COPY backend/ backend/
+COPY main.py .
+COPY start.sh .
+COPY AGENTS.md .
+COPY Cloud_GPU_Matcher_v3_Auto.ipynb .
+COPY Cloud_GPU_Matcher_v4.ipynb .
+COPY colab_executor.py .
+
+RUN mkdir -p /app/reports /app/data /app/logs /root/.ollama
+
+# Ports: 8000=backend, 4040=ngrok admin, 5000=colab executor, 11434=ollama
+EXPOSE 8000 4040 5000 11434
+
+ENV PYTHONPATH=/app
+ENV IB_GATEWAY_URL=http://localhost:4001
+ENV LLM_PROVIDER=openrouter
+ENV OLLAMA_URL=http://localhost:11434
+ENV OLLAMA_NUM_PARALLEL=2
+ENV OLLAMA_MAX_LOADED_MODELS=2
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
+    CMD curl -f http://localhost:8000/api/health || exit 1
+
+COPY docker-entrypoint-universal.sh /entrypoint-universal.sh
+RUN chmod +x /entrypoint-universal.sh
+
+ENTRYPOINT ["/entrypoint-universal.sh"]

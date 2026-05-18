@@ -1,0 +1,65 @@
+services:
+  # EVERYTHING in one container: IBKR Gateway + Backend + Ngrok + Colab Executor
+  universal:
+    build:
+      context: .
+      dockerfile: Dockerfile.universal
+    container_name: arbitrage-universal
+    restart: always
+    ipc: host
+    shm_size: 4gb
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    ports:
+      - "8000:8000"     # Arbitrage backend API
+      - "4040:4040"     # Ngrok admin dashboard
+      - "5000:5000"     # Colab executor service
+    environment:
+      # IBKR Gateway
+      - TERM=xterm
+      - IB_USERNAME=${IB_USERNAME:-fiend6969}
+      - IB_PASSWORD=${IB_PASSWORD:-fj4T-U4FnouobkzN-UL7}
+      - IB_REGION=America
+      - IB_TIMEZONE=America/Vancouver
+      - IB_LOGINTAB=IB API
+      - IB_LOGINTYPE=Live Trading
+      - IB_PREFER_IBKEY=true
+      - IBG_PORT_INTERNAL=4001
+      # Backend
+      - PYTHONPATH=/app
+      - IB_GATEWAY_URL=http://localhost:4001
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - LLM_PROVIDER=openrouter
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - ORACLE_EXECUTOR_URL=http://localhost:5000
+      # Ollama
+      - OLLAMA_URL=http://localhost:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma4:31b-cloud}
+      - OLLAMA_MODEL_2=${OLLAMA_MODEL_2:-qwen2.5:32b}
+      - OLLAMA_NUM_PARALLEL=2
+      - OLLAMA_MAX_LOADED_MODELS=2
+      # Ngrok
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+      - NGROK_ADMIN_URL=http://localhost:4040
+      # Google / Colab
+      - GOOGLE_REFRESH_TOKEN=${GOOGLE_REFRESH_TOKEN}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - COLAB_NOTEBOOK_DRIVE_ID=${COLAB_NOTEBOOK_DRIVE_ID}
+    volumes:
+      - ./data:/home/ibg_settings          # IBKR Gateway settings (persists login)
+      - ./backend:/app/backend              # Live code reload
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+      - ./Cloud_GPU_Matcher_v3_Auto.ipynb:/app/Cloud_GPU_Matcher_v3_Auto.ipynb
+      - ./Cloud_GPU_Matcher_v4.ipynb:/app/Cloud_GPU_Matcher_v4.ipynb
+      - ./data/colab_state.json:/app/data/colab_state.json
+      - ollama-models:/root/.ollama         # Persist Ollama models across restarts
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  ollama-models:
